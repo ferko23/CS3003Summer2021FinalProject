@@ -175,7 +175,7 @@ public class Parser {
     }
   
     private Type type () {
-        // Type  -->  int | bool | float | char 
+        // Type  -->  int | bool | float | char
         Type t = null;
 	if (token.type().equals(TokenType.Int)) {
 		t = Type.INT;
@@ -187,7 +187,9 @@ public class Parser {
 		t = Type.FLOAT;
 	} else if (token.type().equals(TokenType.Void)) {
 		t = Type.VOID;
-	} else error("int | bool | float | char");
+	} else if (token.type().equals(TokenType.Yarp)) {	//new
+		t = Type.YARP;	//new
+	} else error("int | bool | float | char | yarp");	//edited
         // student exercise
         return t;          
     }
@@ -211,6 +213,8 @@ public class Parser {
 		s = ifStatement();
 	} else if (token.type().equals(TokenType.While)) {
 		s = whileStatement();
+	} else if (token.type().equals(TokenType.Ok)) {
+		s = okStatement();
 	} else if (token.type().equals(TokenType.Return)) {
 		s = returnStatement();
 		match(TokenType.Semicolon);
@@ -285,6 +289,16 @@ public class Parser {
         return new Loop(test, st);  // student exercise
     }
 
+    private Loop okStatement () {
+        // WhileStatement --> while ( Expression ) Statement
+	match(token.type());
+	match(TokenType.LeftParen);
+	Expression test = expression();
+	match(TokenType.RightParen);
+	Statement st = statement();
+        return new Loop(test, st);  // student exercise
+    }
+    
     private Return returnStatement() {
     	match(TokenType.Return);
 	Expression result = expression();
@@ -357,8 +371,18 @@ public class Parser {
   
     private Expression term () {
         // Term --> Factor { MultiplyOp Factor }
-        Expression e = factor();
+        Expression e = Comb();
         while (isMultiplyOp()) {
+            Operator op = new Operator(match(token.type()));
+            Expression term2 = Comb();
+            e = new Binary(op, e, term2);
+        }
+        return e;
+    }
+    
+    private Expression Comb () {
+        Expression e = factor();
+        while (isCombinedOp()) {
             Operator op = new Operator(match(token.type()));
             Expression term2 = factor();
             e = new Binary(op, e, term2);
@@ -455,6 +479,10 @@ public class Parser {
                token.type().equals(TokenType.Divide);
     }
     
+    private boolean isCombinedOp() {
+        return token.type().equals(TokenType.Combine);
+    }
+    
     private boolean isUnaryOp( ) {
         return token.type().equals(TokenType.Not) ||
                token.type().equals(TokenType.Minus);
@@ -477,12 +505,14 @@ public class Parser {
             || token.type().equals(TokenType.Bool) 
             || token.type().equals(TokenType.Float)
             || token.type().equals(TokenType.Char)
+            || token.type().equals(TokenType.Yarp) //new
 	    || token.type().equals(TokenType.Void);
     }
     
     private boolean isLiteral( ) {
         return token.type().equals(TokenType.IntLiteral) ||
             isBooleanLiteral() ||
+            token.type().equals(TokenType.YarpLiteral) || //new
             token.type().equals(TokenType.FloatLiteral) ||
             token.type().equals(TokenType.CharLiteral);
     }
@@ -495,7 +525,8 @@ public class Parser {
     public static void main(String args[]) {
 //        Parser parser  = new Parser(new Lexer(args[0])); //Picks the file name and feeds it to the lexer.
 //        Parser parser  = new Parser(new Lexer("hello.cpp"));
-        Parser parser  = new Parser(new Lexer("undeclaredVariable.cpp"));
+//        Parser parser  = new Parser(new Lexer("undeclaredVariable.cpp"));
+        Parser parser  = new Parser(new Lexer("test.cpp"));
         Program prog = parser.program();
         
         prog.applyTypeSystemRules();

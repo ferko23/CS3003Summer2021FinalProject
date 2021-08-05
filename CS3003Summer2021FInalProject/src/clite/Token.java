@@ -17,9 +17,11 @@ public class Token {
     public static final Token floatTok = new Token(TokenType.Float, "float");
     public static final Token ifTok = new Token(TokenType.If, "if");
     public static final Token intTok = new Token(TokenType.Int, "int");
+    public static final Token yarpTok = new Token(TokenType.Yarp, "yarp");	//new
     public static final Token mainTok = new Token(TokenType.Main, "main");
     public static final Token trueTok = new Token(TokenType.True, "true");
     public static final Token whileTok = new Token(TokenType.While, "while");
+    public static final Token okTok = new Token(TokenType.Ok, "ok");
     public static final Token voidTok = new Token(TokenType.Void, "void");
     public static final Token returnTok = new Token(TokenType.Return, "return");
     public static final Token printTok = new Token(TokenType.Print, "print");
@@ -45,6 +47,7 @@ public class Token {
     public static final Token divideTok = new Token(TokenType.Divide, "/");
     public static final Token andTok = new Token(TokenType.And, "&&");
     public static final Token orTok = new Token(TokenType.Or, "||");
+    public static final Token Combine = new Token(TokenType.Combine, "@");
 
     private TokenType type;
     private String value = "";
@@ -79,6 +82,10 @@ public class Token {
     public static Token mkIntLiteral (String name) {
         return new Token(TokenType.IntLiteral, name);
     }
+    
+    public static Token mkYarpLiteral (String name) {	//new
+        return new Token(TokenType.YarpLiteral, name);	//new
+    }	//new
 
     public static Token mkFloatLiteral (String name) {
         return new Token(TokenType.FloatLiteral, name);
